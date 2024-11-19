@@ -23,6 +23,7 @@ type Content interface {
 
 func (s Story) ToMap() gin.H {
     return gin.H{
+		"title":      s.Title,
         "content":    s.Content,
         "dictionary": s.Dictionary,
     }
@@ -44,6 +45,7 @@ type Dictionary struct {
 }
 
 type Story struct {
+	Title      string     `json:"title"`
 	Content    string     `json:"story"`
 	Dictionary Dictionary `json:"dictionary"`
 }

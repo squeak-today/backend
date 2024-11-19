@@ -14,13 +14,15 @@ import (
 )
 
 type StoryData struct {
+	Title string `json:"title"`
 	Story string `json:"story"`
 	Translations StoryDictionary `json:"dictionary"`
 }
 
 // create []byte to pass as Body into uploadStoryS3 from story content and the StoryDictionary
-func buildStoryBody(story string, dictionary StoryDictionary) ([]byte, error) {
+func buildStoryBody(title string, story string, dictionary StoryDictionary) ([]byte, error) {
 	storyData := StoryData{
+		Title: title,
 		Story: story,
 		Translations: dictionary,
 	}

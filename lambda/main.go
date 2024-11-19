@@ -17,6 +17,8 @@ import (
 
     "time"
     "strings"
+
+	"encoding/json"
 )
 
 // on current lambda specs
@@ -52,12 +54,21 @@ func handler(ctx context.Context) error {
 				storyResponse, err := generateStory(languages[i], cefrLevels[j], subjects[k])
     
 				if err == nil {
-					story := storyResponse.Message.Content[0].Text
+					// story := storyResponse.Message.Content[0].Text
+					// log.Println("Story:", story)
+
+					var titledStory TitledStory
+					err := json.Unmarshal([]byte(storyResponse.Message.Content[0].Text), &titledStory)
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					story := titledStory.Story
 					log.Println("Story:", story)
 
 					words, sentences := getWordsAndSentences(story)
 					dictionary, _ := generateTranslations(words, sentences, language_ids[languages[i]])
-					body, _ := buildStoryBody(story, dictionary)
+					body, _ := buildStoryBody(titledStory.Title, story, dictionary)
 
 					current_time := time.Now().UTC().Format("2006-01-02")
 

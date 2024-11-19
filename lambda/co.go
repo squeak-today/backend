@@ -45,6 +45,11 @@ type v2Response struct {
 	} `json:"message"`
 }
 
+type TitledStory struct {
+	Title string `json:"title"`
+	Story string `json:"story"`
+}
+
 var cefrPrompts = map[string]string{
 	"A1": "must use extremely basic, everyday vocabulary and short sentences and must be 60-120 words.",
 	"A2": "must use simple vocabulary and clear sentences with some basic connectors. You must aim for 120-160 words.",
@@ -62,13 +67,13 @@ func generateStory(language string, cefr string, topic string) (v2Response, erro
 	
 	var sb strings.Builder
 	sb.WriteString("You are an LLM designed to write " + language + " fiction stories. ")
-	sb.WriteString("Using the topic of " + topic + ", write a fictional story that matches the writing complexity of " + cefr + " on the CEFR scale.")
+	sb.WriteString("Using the topic of " + topic + ", generate a JSON with a title and a fictional story that matches the writing complexity of " + cefr + " on the CEFR scale.")
 	sb.WriteString("Your story " + cefrPrompts[cefr] + " ")
 	sb.WriteString("Provide the story without preamble or other comment.\n\n")
 
 	startingMessage := sb.String()
 	coherePayload := map[string]interface{}{
-        "model": "c4ai-aya-expanse-32b",
+        "model": "command-r-plus-08-2024",
         "messages": []map[string]string{
             {
 				"role": "system",
@@ -79,6 +84,17 @@ func generateStory(language string, cefr string, topic string) (v2Response, erro
 				"content": startingMessage,
 			},
         },
+		"response_format": map[string]interface{}{
+			"type": "json_object",
+			"json_schema": map[string]interface{}{
+				"type": "object",
+				"properties": map[string]map[string]string{
+					"title": {"type":"string"},
+					"story":{"type":"string"},
+				},
+				"required": []string{"title", "story"},
+			},
+		},
     }
 
 	jsonData, err := json.Marshal(coherePayload)
